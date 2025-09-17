@@ -8,22 +8,15 @@ const Particle = particle.Particle;
 const randVal = rl.getRandomValue;
 
 pub fn main() !void {
-    var gpa = std.heap.DebugAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
-
     const screenWidth = 800;
     const screenHeight = 800;
 
     rl.setRandomSeed(1);
 
     const particleCount = 10000;
-    var particles = std.array_list.Managed(Particle).init(allocator);
-    try particles.ensureTotalCapacityPrecise(particleCount);
-    defer particles.deinit();
+    var particles: [particleCount]Particle = undefined;
 
-    // Initialize particles with random positions and velocities
-    for (0..particleCount) |_| {
+    for (&particles) |*item| {
         const pos = vec2{
             .x = @floatFromInt(randVal(0, screenWidth - 1)),
             .y = @floatFromInt(randVal(0, screenHeight - 1)),
@@ -39,7 +32,8 @@ pub fn main() !void {
             .vel = vel,
             .color = color,
         };
-        try particles.append(newParticle);
+
+        item.* = newParticle;
     }
 
     rl.initWindow(screenWidth, screenHeight, "Gravitational Loss - Particles");
@@ -49,7 +43,7 @@ pub fn main() !void {
 
     while (!rl.windowShouldClose()) {
         const mousePos = vec2{ .x = @floatFromInt(rl.getMouseX()), .y = @floatFromInt(rl.getMouseY()) };
-        for (particles.items) |*item| {
+        for (&particles) |*item| {
             item.attract(mousePos, 1);
             item.doFriction(0.99);
             item.move(screenWidth, screenHeight);
@@ -60,7 +54,7 @@ pub fn main() !void {
 
         rl.clearBackground(.black);
 
-        for (particles.items) |*item| {
+        for (&particles) |*item| {
             item.drawPixel();
         }
 
