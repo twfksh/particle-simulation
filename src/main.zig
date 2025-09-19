@@ -1,4 +1,7 @@
 const std = @import("std");
+const c = @cImport({
+    @cInclude("math.h");
+});
 const rl = @import("raylib");
 const particle = @import("particle");
 
@@ -36,13 +39,26 @@ pub fn main() !void {
         item.* = newParticle;
     }
 
-    rl.initWindow(screenWidth, screenHeight, "Gravitational Loss - Particles");
+    rl.initWindow(screenWidth, screenHeight, "Particles");
     defer rl.closeWindow();
+
+    var camera = rl.Camera2D{
+        .offset = .{ .x = 0, .y = 0 },
+        .target = .{ .x = 0, .y = 0 },
+        .rotation = 0,
+        .zoom = 2,
+    };
 
     rl.setTargetFPS(60);
 
     while (!rl.windowShouldClose()) {
-        const mousePos = vec2{ .x = @floatFromInt(rl.getMouseX()), .y = @floatFromInt(rl.getMouseY()) };
+        const mouseWheelMove = rl.getMouseWheelMove();
+        if (mouseWheelMove != 0) {
+            onMouseWheelScroll(&camera, mouseWheelMove);
+        }
+
+        const mouseWorldPos = rl.getScreenToWorld2D(rl.getMousePosition(), camera);
+        const mousePos = vec2{ .x = mouseWorldPos.x, .y = mouseWorldPos.y };
         for (&particles) |*item| {
             item.attract(mousePos, 1);
             item.doFriction(0.99);
@@ -52,6 +68,9 @@ pub fn main() !void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
+        rl.beginMode2D(camera);
+        defer rl.endMode2D();
+
         rl.clearBackground(.black);
 
         for (&particles) |*item| {
@@ -60,4 +79,15 @@ pub fn main() !void {
 
         rl.drawFPS(10, 10);
     }
+}
+
+fn onMouseWheelScroll(camera: *rl.Camera2D, mouseWheelMove: f32) void {
+    const mouseScreenPos = rl.getMousePosition();
+    const mouseWorldPos = rl.getScreenToWorld2D(mouseScreenPos, camera.*);
+    camera.offset = mouseScreenPos;
+    camera.target = mouseWorldPos;
+
+    const scaleFactor = 0.2;
+    const new_zoom = c.expf(c.logf(camera.zoom) + scaleFactor * mouseWheelMove);
+    camera.zoom = std.math.clamp(new_zoom, 0.125, 64.0);
 }
