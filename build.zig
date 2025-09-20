@@ -30,7 +30,7 @@ pub fn build(b: *std.Build) !void {
             .root_module = exe_mod,
         });
 
-        const install_dir: std.Build.InstallDir = .{ .custom = "web" };
+        const install_dir: std.Build.InstallDir = .{ .custom = "public" };
         var emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{
             .optimize = optimize,
             .asyncify = true,
