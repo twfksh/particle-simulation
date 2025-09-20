@@ -1,11 +1,8 @@
 const std = @import("std");
-const c = @cImport({
-    @cInclude("math.h");
-});
+const math = std.math;
 const rl = @import("raylib");
 
 const sqrt = std.math.sqrt;
-const fmax = c.fmax;
 const vec2 = rl.Vector2;
 const Color = rl.Color;
 
@@ -34,7 +31,7 @@ pub const Particle = struct {
     pub fn attract(self: *Self, posToAttract: vec2, multiplier: f32) void {
         _ = multiplier;
 
-        const dist = fmax(self.getDist(posToAttract), 0.5);
+        const dist = @max(self.getDist(posToAttract), 0.5);
         const normal = self.getNormal(posToAttract);
 
         self.vel.x -= normal.x / @as(f32, @floatCast(dist));

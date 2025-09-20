@@ -1,9 +1,7 @@
 const std = @import("std");
-const c = @cImport({
-    @cInclude("math.h");
-});
+const math = std.math;
 const rl = @import("raylib");
-const particle = @import("particle");
+const particle = @import("particle.zig");
 
 const vec2 = rl.Vector2;
 const Color = rl.Color;
@@ -88,6 +86,6 @@ fn onMouseWheelScroll(camera: *rl.Camera2D, mouseWheelMove: f32) void {
     camera.target = mouseWorldPos;
 
     const scaleFactor = 0.2;
-    const new_zoom = c.expf(c.logf(camera.zoom) + scaleFactor * mouseWheelMove);
-    camera.zoom = std.math.clamp(new_zoom, 0.125, 64.0);
+    const new_zoom = math.exp(math.log10(camera.zoom) + scaleFactor * mouseWheelMove);
+    camera.zoom = math.clamp(new_zoom, 0.125, 64.0);
 }

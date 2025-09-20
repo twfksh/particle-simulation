@@ -1,12 +1,16 @@
 .{
     .name = .particles,
-    .version = "0.0.0",
+    .version = "0.1.0",
     .fingerprint = 0xcc55397a0101aec7, // Changing this has security and trust implications.
     .minimum_zig_version = "0.15.1",
     .dependencies = .{
         .raylib_zig = .{
             .url = "git+https://github.com/raylib-zig/raylib-zig?ref=devel#39ce5d4a8e8eab9c533f5787e3206d997a9e2111",
             .hash = "raylib_zig-5.6.0-dev-KE8REDc2BQCri1t11guC1tZA-Luc7NuVeml_59LSELLe",
+        },
+        .emsdk = .{
+            .url = "git+https://github.com/emscripten-core/emsdk?ref=4.0.9#3bcf1dcd01f040f370e10fe673a092d9ed79ebb5",
+            .hash = "N-V-__8AAJl1DwBezhYo_VE6f53mPVm00R-Fk28NPW7P14EQ",
         },
     },
     .paths = .{
