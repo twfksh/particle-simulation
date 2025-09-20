@@ -31,14 +31,18 @@ pub fn build(b: *std.Build) !void {
         });
 
         const install_dir: std.Build.InstallDir = .{ .custom = "public" };
-        var emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{
+        const emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{
             .optimize = optimize,
             .asyncify = true,
         });
-        try emcc_flags.put("-sSTACK_SIZE=16777216", {});
-        const emcc_settings = emsdk.emccDefaultSettings(b.allocator, .{
+
+        var emcc_settings = emsdk.emccDefaultSettings(b.allocator, .{
             .optimize = optimize,
+            .es3 = true,
         });
+        try emcc_settings.put("USE_WEBGL2", "1");
+        try emcc_settings.put("STACK_SIZE", "16777216");
+        try emcc_settings.put("ALLOW_MEMORY_GROWTH", "1");
 
         const emcc_step = emsdk.emccStep(b, raylib_artifact, wasm, .{
             .optimize = optimize,
@@ -46,7 +50,7 @@ pub fn build(b: *std.Build) !void {
             .settings = emcc_settings,
             .shell_file_path = emsdk.shell(raylib_dep.builder),
             .install_dir = install_dir,
-            .embed_paths = &.{.{ .src_path = "resources/" }},
+            // .embed_paths = &.{.{ .src_path = "resources/" }},
         });
         b.getInstallStep().dependOn(emcc_step);
 

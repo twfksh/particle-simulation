@@ -9,8 +9,8 @@ const Particle = particle.Particle;
 const randVal = rl.getRandomValue;
 
 pub fn main() !void {
-    const screenWidth = 800;
-    const screenHeight = 800;
+    const screenWidth = 1280;
+    const screenHeight = 720;
 
     rl.setRandomSeed(1);
 
